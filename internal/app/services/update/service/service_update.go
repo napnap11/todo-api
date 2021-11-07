@@ -45,6 +45,7 @@ func (s service) Update(req dto.UpdateRequest) dto.UpdateResponse {
 	}
 
 	todo = models.Todo{
+		ID:     req.ID,
 		Title:  req.Title,
 		Date:   req.Date,
 		Status: req.Status,
