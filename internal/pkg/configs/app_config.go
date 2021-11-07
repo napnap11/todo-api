@@ -2,6 +2,7 @@ package configs
 
 import (
 	"crypto/tls"
+	"gopkg.in/go-playground/validator.v8"
 	"net/http"
 	"time"
 
@@ -15,6 +16,7 @@ var AppConfig = &AppConfigs{}
 
 type AppConfigs struct {
 	HTTPTransport *http.Transport
+	Validator     *validator.Validate
 	HttpTransport struct {
 		MaxIdleCons           int           `mapstructure:"max_idle_cons"`
 		MaxIdleConsPerHost    int           `mapstructure:"max_idle_cons_per_host"`
@@ -75,5 +77,7 @@ func bindingAppConfig(vp *viper.Viper, appConf *AppConfigs) error {
 		ExpectContinueTimeout: appConf.HttpTransport.ExpectContinueTimeout,
 	}
 	appConf.HTTPTransport = &tp
+
+	appConf.Validator = validator.New(&validator.Config{TagName: "validate"})
 	return nil
 }

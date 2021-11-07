@@ -1,12 +1,16 @@
 package routes
 
 import (
+	"github.com/napnap11/todo-api/internal/pkg/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
+
+	createHandler "github.com/napnap11/todo-api/internal/app/services/create/handler"
+	createService "github.com/napnap11/todo-api/internal/app/services/create/service"
 )
 
 const (
@@ -26,6 +30,8 @@ func NewRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	repo := repository.NewRepository()
+	create := createHandler.NewHandler(createService.NewService(repo))
 
 	// ===================== START ROUTES (add routes here) ========================
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -40,6 +46,12 @@ func NewRouter() *gin.Engine {
 	}
 
 	v1 := []Route{
+		{
+			desc:    "create",
+			method:  post,
+			path:    "/create",
+			handler: create.Create,
+		},
 	}
 
 	log.Printf("==========PATH==========\n")
