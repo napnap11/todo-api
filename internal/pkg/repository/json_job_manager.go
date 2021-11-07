@@ -11,10 +11,16 @@ type Job interface {
 	Modify(data []models.Todo) ([]models.Todo, error)
 }
 
+func InitJob(){
+	db := "./db.json"
+	jobs := make(chan Job)
+	go ProcessJobs(jobs, db)
+}
+
 func ProcessJobs(jobs chan Job, db string) {
 	for {
 		j := <-jobs
-		var data []models.Todo
+		data := make([]models.Todo, 0)
 		content, err := ioutil.ReadFile(db)
 		if err == nil {
 			if err = json.Unmarshal(content, &data); err == nil {

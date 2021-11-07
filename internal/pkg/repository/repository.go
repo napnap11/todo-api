@@ -11,6 +11,7 @@ type Repository struct {
 }
 
 func NewRepository() *Repository {
+	InitJob()
 	return &Repository{}
 }
 
@@ -48,6 +49,14 @@ func (r Repository) CreateTodo(newTodo models.Todo) error {
 	if err != nil {
 		return err
 	}
-	todos = append(todos,newTodo)
+	todos = append(todos, newTodo)
 	return r.WriteTodos(todos)
+}
+
+func (r Repository) GetTodosWithSortAndSearch(sortBy, sortType, title, description string) ([]models.Todo, error) {
+	todos, err := r.GetTodos()
+	if err != nil {
+		return []models.Todo{}, err
+	}
+	return todos, nil
 }

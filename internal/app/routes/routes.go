@@ -11,6 +11,8 @@ import (
 
 	createHandler "github.com/napnap11/todo-api/internal/app/services/create/handler"
 	createService "github.com/napnap11/todo-api/internal/app/services/create/service"
+	listHandler "github.com/napnap11/todo-api/internal/app/services/list/handler"
+	listService "github.com/napnap11/todo-api/internal/app/services/list/service"
 )
 
 const (
@@ -30,8 +32,10 @@ func NewRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+
 	repo := repository.NewRepository()
 	create := createHandler.NewHandler(createService.NewService(repo))
+	list := listHandler.NewHandler(listService.NewService(repo))
 
 	// ===================== START ROUTES (add routes here) ========================
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -51,6 +55,12 @@ func NewRouter() *gin.Engine {
 			method:  post,
 			path:    "/create",
 			handler: create.Create,
+		},
+		{
+			desc:    "list",
+			method:  post,
+			path:    "/list",
+			handler: list.List,
 		},
 	}
 
