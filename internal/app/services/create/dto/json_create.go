@@ -6,7 +6,7 @@ type CreateRequest struct {
 	Description string `json:"description"`
 	Date        string `json:"date" validate:"required"`
 	Status      string `json:"status" validate:"required"`
-	Image       string `json:"image" validate:"base64"`
+	Image       string `json:"image,omitempty" validate:"omitempty,base64"`
 }
 
 type CreateResponse struct {

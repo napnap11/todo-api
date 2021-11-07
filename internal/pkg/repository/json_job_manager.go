@@ -3,6 +3,7 @@ package repository
 import (
 	"encoding/json"
 	"github.com/napnap11/todo-api/internal/pkg/models"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 )
 
@@ -11,15 +12,19 @@ type Job interface {
 	Modify(data map[string]models.Todo) (map[string]models.Todo, error)
 }
 
-func InitJob() {
+func InitJob() chan Job {
 	db := "./db.json"
 	jobs := make(chan Job)
+	log.Infof("init job")
 	go ProcessJobs(jobs, db)
+	return jobs
 }
 
 func ProcessJobs(jobs chan Job, db string) {
 	for {
+		log.Infof("wait job")
 		j := <-jobs
+		log.Infof("get a job")
 		data := make(map[string]models.Todo, 0)
 		content, err := ioutil.ReadFile(db)
 		if err == nil {

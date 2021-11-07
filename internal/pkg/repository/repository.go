@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/napnap11/todo-api/internal/pkg/models"
+	log "github.com/sirupsen/logrus"
 )
 
 var ErrorNotFound = errors.New("not found")
@@ -13,8 +14,8 @@ type Repository struct {
 }
 
 func NewRepository() *Repository {
-	InitJob()
-	return &Repository{}
+	jobs := InitJob()
+	return &Repository{Jobs:jobs}
 }
 
 func (r Repository) GetTodos() ([]models.Todo, error) {
@@ -34,8 +35,11 @@ func (r Repository) GetTodos() ([]models.Todo, error) {
 }
 
 func (r Repository) GetTodoById(id string) (models.Todo, error) {
+	log.Infof("start GetTodoById")
 	job := NewReadTodosJob()
+	log.Infof("sending job to jobs")
 	r.Jobs <- job
+	log.Infof("sent job to jobs")
 	if err := <-job.ExitChan(); err != nil {
 		return models.Todo{}, err
 	}
@@ -55,10 +59,12 @@ func (r Repository) WriteTodos(todos []models.Todo) error {
 }
 
 func (r Repository) CheckDuplicateID(id string) error {
+	log.Infof("start check dup")
 	_, err := r.GetTodoById(id)
 	if err != nil && err != ErrorNotFound {
 		return err
 	}
+	log.Infof("done GetTodoById")
 	if err == ErrorNotFound {
 		return nil
 	}
