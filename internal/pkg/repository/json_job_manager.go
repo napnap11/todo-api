@@ -8,10 +8,10 @@ import (
 
 type Job interface {
 	ExitChan() chan error
-	Modify(data []models.Todo) ([]models.Todo, error)
+	Modify(data map[string]models.Todo) (map[string]models.Todo, error)
 }
 
-func InitJob(){
+func InitJob() {
 	db := "./db.json"
 	jobs := make(chan Job)
 	go ProcessJobs(jobs, db)
@@ -20,7 +20,7 @@ func InitJob(){
 func ProcessJobs(jobs chan Job, db string) {
 	for {
 		j := <-jobs
-		data := make([]models.Todo, 0)
+		data := make(map[string]models.Todo, 0)
 		content, err := ioutil.ReadFile(db)
 		if err == nil {
 			if err = json.Unmarshal(content, &data); err == nil {
@@ -39,20 +39,20 @@ func ProcessJobs(jobs chan Job, db string) {
 }
 
 type ReadTodosJob struct {
-	todos    chan []models.Todo
+	todos    chan map[string]models.Todo
 	exitChan chan error
 }
 
 func NewReadTodosJob() *ReadTodosJob {
 	return &ReadTodosJob{
-		todos:    make(chan []models.Todo, 1),
+		todos:    make(chan map[string]models.Todo, 1),
 		exitChan: make(chan error, 1),
 	}
 }
 func (j ReadTodosJob) ExitChan() chan error {
 	return j.exitChan
 }
-func (j ReadTodosJob) Modify(todos []models.Todo) ([]models.Todo, error) {
+func (j ReadTodosJob) Modify(todos map[string]models.Todo) (map[string]models.Todo, error) {
 	j.todos <- todos
 
 	return nil, nil
@@ -72,6 +72,10 @@ func NewWriteTodosJob(newTodos []models.Todo) *WriteTodosJob {
 func (j WriteTodosJob) ExitChan() chan error {
 	return j.exitChan
 }
-func (j WriteTodosJob) Modify(todos []models.Todo) ([]models.Todo, error) {
-	return j.newTodos, nil
+func (j WriteTodosJob) Modify(todos map[string]models.Todo) (map[string]models.Todo, error) {
+	data := make(map[string]models.Todo, 0)
+	for _, newTodo := range j.newTodos {
+		data[newTodo.ID] = newTodo
+	}
+	return data, nil
 }
