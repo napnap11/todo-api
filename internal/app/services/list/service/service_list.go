@@ -72,7 +72,7 @@ func (s service) ValidateRequest(req dto.ListRequest) error {
 		return errors.New("invalid sort_by")
 	}
 
-	if req.SortType != "desc" && req.SortType != "asc" && req.SortType != "" {
+	if req.SortType != "dsc" && req.SortType != "asc" && req.SortType != "" {
 		log.Errorf("[List] invalid sort_type")
 		return errors.New("invalid sort_type")
 	}
@@ -112,21 +112,21 @@ func (s service) Sort(req dto.ListRequest, todos []models.Todo) ([]models.Todo, 
 		switch req.SortBy {
 		case "title":
 			switch req.SortType {
-			case "desc":
+			case "dsc":
 				return todos[i].Title < todos[j].Title
 			case "asc":
 				return todos[i].Title > todos[j].Title
 			}
 		case "date":
 			switch req.SortType {
-			case "desc":
+			case "dsc":
 				return todos[i].Date < todos[j].Date
 			case "asc":
 				return todos[i].Date > todos[j].Date
 			}
 		case "status":
 			switch req.SortType {
-			case "desc":
+			case "dsc":
 				return todos[i].Status < todos[j].Status
 			case "asc":
 				return todos[i].Status > todos[j].Status
